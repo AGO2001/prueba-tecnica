@@ -21,7 +21,7 @@ Proyecto desarrollado para evaluación técnica. Consiste en una aplicación web
 │   └── .env             # Variables de entorno (VITE_API_URL)
 ├── package.json         # Ejecución concurrente del entorno de desarrollo
 └── README.md
-
+```
 Requisitos Previos
 
     Python 3.10+
