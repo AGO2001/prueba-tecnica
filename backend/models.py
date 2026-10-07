@@ -1,10 +1,11 @@
-from sqlalchemy import Column, Integer, String, Float
-from .database import Base
+from datetime import datetime, timezone
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from backend.database import Base
 
-class Item(Base):
-    __tablename__ = "items"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(100), nullable=False)
-    descripcion = Column(String(255))
-    precio = Column(Float, nullable=False)
+class Task(Base):
+    __tablename__ = "tasks"
+    id=Column(Integer, primary_key=True, index=True)
+    title=Column(String(120), nullable=False)
+    priority=Column(String(10), nullable=False, default="medium")
+    done=Column(Boolean, nullable=False, default=False)
+    created_at=Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))   
