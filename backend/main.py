@@ -17,7 +17,7 @@ app = FastAPI(title="API de Prueba Técnica")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,12 +32,12 @@ class TaskCreate(BaseModel):
     def validate_priority(cls, value):
         allowed = ["low", "medium", "high"]
         if value not in allowed:
-            raise ValueError("Priority must be one of low, medium, or high")
+            raise ValueError("la prioridad debe ser low, medium, or high")
         return value
     @field_validator("title")
     def validate_title(cls, value):
         if not value or not value.strip():
-            raise ValueError("Title cannot be empty")
+            raise ValueError("el título no puede estar vacío")
         return value.strip()
 
 class TaskUpdateStatus(BaseModel):
@@ -54,11 +54,11 @@ class TaskResponse(BaseModel):
         from_attributes = True
 # Endpoints
 @app.get("/api/tasks", response_model=list[TaskResponse])
-def get_tasks(done: Optional[bool] = Query("done"), db: Session = Depends(get_db)):
+def get_tasks(done: Optional[bool] = Query(None), db: Session = Depends(get_db)):
     query = db.query(models.Task)
     if done is not None:
         query = query.filter(models.Task.done == done)
-    tasks = query = query.filter(models.Task.created_at.desc()).all()
+    tasks = query.order_by(models.Task.created_at.desc()).all()
     return tasks
 
 @app.post("/api/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
@@ -76,7 +76,7 @@ def create_task(Task_data: TaskCreate, db: Session = Depends(get_db)):
 def update_task_status(task_id: int, status_update: TaskUpdateStatus, db: Session = Depends(get_db)):
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if not task:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tarea no encontrada")
     task.done = status_update.done
     db.commit()
     db.refresh(task)
@@ -86,7 +86,7 @@ def update_task_status(task_id: int, status_update: TaskUpdateStatus, db: Sessio
 def delete_task(task_id: int, db: Session = Depends(get_db)):
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if not task:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tarea no encontrada")
     db.delete(task)
     db.commit()
     return None
