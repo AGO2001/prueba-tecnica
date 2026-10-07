@@ -1,82 +1,86 @@
-# Prueba Técnica Full-Stack: FastAPI + PostgreSQL + Vue 3
+# Gestor de tareas: FastAPI + PostgreSQL + Vue 3
 
-Proyecto desarrollado para evaluación técnica. Consiste en una aplicación web full-stack modular para la gestión de registros (ítems), utilizando FastAPI en el backend, PostgreSQL como base de datos relacional y Vue 3 (Composition API) con Vite en el frontend.
+Aplicación full-stack para crear, consultar, completar y eliminar tareas. El backend usa FastAPI y SQLAlchemy; el frontend usa Vue 3 y Vite. El script de desarrollo de la raíz ejecuta el backend y el frontend en paralelo con `concurrently`.
 
-## Arquitectura del Proyecto
+## Requisitos
 
-```text
-├── backend/
-│   ├── main.py          # Definición de endpoints FastAPI y esquemas Pydantic
-│   ├── database.py      # Configuración de SQLAlchemy y gestión de sesión
-│   ├── models.py        # Modelos ORM / Tablas PostgreSQL
-│   ├── requirements.txt # Dependencias de Python
-│   └── .env             # Variables de entorno (DATABASE_URL)
-├── frontend/
-│   ├── src/
-│   │   ├── components/  # Componentes reutilizables (ItemForm.vue, ItemList.vue)
-│   │   ├── services/    # Módulo de peticiones HTTP (api.js)
-│   │   ├── App.vue      # Vista principal
-│   │   └── style.css    # Estilos globales
-│   ├── package.json     # Dependencias de Node
-│   └── .env             # Variables de entorno (VITE_API_URL)
-├── package.json         # Ejecución concurrente del entorno de desarrollo
-└── README.md
+- Python 3.10 o superior
+- Node.js y npm
+- PostgreSQL activo
+
+## Configuración inicial
+
+Ejecuta estos pasos desde la raíz del repositorio.
+
+### 1. Crear la base de datos
+
+Si todavía no existe, créala en PostgreSQL:
+
+```bash
+createdb -U postgres mibase
 ```
-Requisitos Previos
 
-    Python 3.10+
+También puedes crearla desde `psql`:
 
-    Node.js 18+
+```sql
+CREATE DATABASE mibase;
+```
 
-    PostgreSQL activo localmente o mediante servidor remoto.
+### 2. Crear la tabla
 
-Configuración del Entorno
-1. Variables de Entorno
+Desde la raíz del repositorio, ejecuta el esquema contra la base de datos `mibase`:
 
-Crear el archivo backend/.env:
-Fragmento de código
+```bash
+psql -U postgres -d mibase -f backend/scheme.sql
+```
 
-DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/nombre_bd
+El esquema crea la tabla `tasks` con las columnas `id`, `title`, `priority`, `done` y `created_at`. El archivo contiene `CREATE TABLE IF NOT EXISTS`; por tanto, no cambia una tabla `tasks` que ya exista. Si ya tienes una tabla creada con nombres de columnas diferentes, debes alinearla con el modelo en `backend/models.py` antes de iniciar la aplicación.
 
-Crear el archivo frontend/.env:
-Fragmento de código
+### 3. Configurar la conexión
 
-VITE_API_URL=http://localhost:8000
+Crea `backend/.env` con la URL de tu PostgreSQL:
 
-2. Instalación de Dependencias
+```env
+DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/mibase
+```
 
-Backend (Python):
-Bash
+Sustituye `usuario` y `contraseña` por tus credenciales. La base de datos `mibase` debe existir antes de arrancar el backend.
 
-cd backend
-python -m venv venv
-# En Linux/macOS:
+### 4. Instalar dependencias
+
+Desde la raíz, prepara el entorno Python que utiliza el comando concurrente del proyecto:
+
+```bash
+python3 -m venv venv
 source venv/bin/activate
-# En Windows:
-venv\Scripts\activate
+pip install -r backend/requirements.txt
+```
 
-pip install -r requirements.txt
+Instala las dependencias del frontend y el ejecutor concurrente:
 
-Frontend (Node):
-Bash
-
-cd frontend
+```bash
+npm install --prefix frontend
 npm install
+```
 
-Raíz (Para desarrollo simultáneo):
-Bash
+## Iniciar backend y frontend juntos
 
-npm install
+Desde la raíz del repositorio, con el entorno virtual activado, ejecuta:
 
-Ejecución del Proyecto
-
-Para levantar tanto el backend como el frontend de forma simultánea desde la raíz:
-Bash
-
+```bash
 npm run dev
+```
 
-    Frontend: http://localhost:5173
+Este comando inicia ambos procesos en paralelo:
 
-    Backend API: http://localhost:8000
+- Frontend: <http://localhost:5173>
+- API backend: <http://localhost:8000>
+- Documentación interactiva de FastAPI: <http://localhost:8000/docs>
 
-    Documentación Swagger: http://localhost:8000/docs
+Los logs se muestran identificados como `BACKEND` y `FRONTEND`. Pulsa `Ctrl+C` para detener ambos procesos. No es necesario iniciar cada servidor en otra terminal.
+
+## Pendientes
+
+- Añadir migraciones versionadas para actualizar tablas existentes de forma segura. `scheme.sql` sirve para crear la tabla inicial; `Base.metadata.create_all()` no modifica columnas de tablas ya creadas.
+- Añadir pruebas automatizadas para los endpoints del backend y los flujos principales del frontend.
+- Mover la configuración del origen CORS a una variable de entorno; actualmente el backend permite el origen local `http://localhost:5173`.
