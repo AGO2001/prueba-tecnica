@@ -84,3 +84,13 @@ Los logs se muestran identificados como `BACKEND` y `FRONTEND`. Pulsa `Ctrl+C` p
 - Añadir migraciones versionadas para actualizar tablas existentes de forma segura. `scheme.sql` sirve para crear la tabla inicial; `Base.metadata.create_all()` no modifica columnas de tablas ya creadas.
 - Añadir pruebas automatizadas para los endpoints del backend y los flujos principales del frontend.
 - Mover la configuración del origen CORS a una variable de entorno; actualmente el backend permite el origen local `http://localhost:5173`.
+
+## Entregables
+
+Incluye el código fuente, los archivos de dependencias y configuración de ejemplo, el esquema SQL y este README. No incluyas ni subas:
+
+- Archivos `.env` con configuración local o credenciales.
+- Directorios `node_modules/`.
+- Entornos virtuales de Python, como `venv/` o `.venv/`.
+
+Estos archivos y directorios están excluidos por `.gitignore`. Cada persona debe crear su propio `.env` local siguiendo las instrucciones anteriores e instalar las dependencias en su equipo.

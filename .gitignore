@@ -9,8 +9,11 @@ __pycache__/
 *.py[cod]
 venv/
 .venv/
-backend/.env
-frontend/.env
+
+# Local environment variables
+.env
+.env.*
+!.env.example
 
 # Logs
 logs
